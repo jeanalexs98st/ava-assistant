@@ -5,6 +5,11 @@ from contextlib import contextmanager
 
 DB_PATH = os.getenv("DB_PATH", "finance.db")
 
+# Create directory if it doesn't exist (needed for Railway volumes)
+_db_dir = os.path.dirname(DB_PATH)
+if _db_dir:
+    os.makedirs(_db_dir, exist_ok=True)
+
 
 @contextmanager
 def get_db():
