@@ -243,5 +243,6 @@ def parse_intent(message: str, last_message: str = "", last_reply: str = "") -> 
             if raw.startswith("json"):
                 raw = raw[4:]
         return json.loads(raw.strip())
-    except Exception:
+    except Exception as e:
+        print(f"❌ Intent parser error: {e}")
         return {"intent": "unknown", "lang": None}
