@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0D0D1A">
+<title>Ava — Your AI Life Companion</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  :root {
+    --bg: #0D0D1A; --card: #1A1A2E; --border: #2D2D4A;
+    --purple: #7C3AED; --purple-light: #A78BFA;
+    --green: #10B981; --red: #EF4444; --yellow: #F59E0B;
+    --text: #F0F0FF; --muted: #8B8BA7; --cyan: #06B6D4;
+  }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; min-height: 100vh; }
+
+  /* NAV */
+  .nav { display: flex; background: var(--card); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+  .nav-btn { flex: 1; padding: 14px 4px 10px; background: none; border: none; color: var(--muted); cursor: pointer; font-size: 10px; display: flex; flex-direction: column; align-items: center; gap: 3px; transition: color 0.2s; }
+  .nav-btn.active { color: var(--purple); }
+  .nav-btn .icon { font-size: 20px; }
+
+  /* SCREENS */
+  .screen { display: none; padding: 16px; padding-bottom: 32px; max-width: 480px; margin: 0 auto; }
+  .screen.active { display: block; }
+
+  /* CARDS */
+  .card { background: var(--card); border-radius: 16px; padding: 18px; margin-bottom: 14px; border: 1px solid var(--border); }
+  .card-title { font-size: 15px; font-weight: 700; margin-bottom: 14px; }
+
+  /* HEADER */
+  .page-header { margin-bottom: 16px; }
+  .page-header h1 { font-size: 26px; font-weight: 800; }
+  .page-header p { color: var(--muted); font-size: 13px; margin-top: 4px; }
+
+  /* STATS ROW */
+  .stats-row { display: flex; gap: 10px; margin-bottom: 14px; }
+  .stat-card { flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px 10px; text-align: center; }
+  .stat-card .s-icon { font-size: 18px; }
+  .stat-card .s-label { font-size: 10px; color: var(--muted); margin: 4px 0 2px; }
+  .stat-card .s-value { font-size: 13px; font-weight: 700; }
+
+  /* PROGRESS BAR */
+  .bar-bg { background: #2D2D4A; border-radius: 6px; height: 8px; overflow: hidden; margin: 8px 0; }
+  .bar-fill { height: 100%; border-radius: 6px; background: var(--purple); transition: width 0.6s ease; }
+
+  /* LISTS */
+  .list-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .list-item:last-child { border-bottom: none; }
+  .time-badge { background: rgba(124,58,237,0.15); color: var(--purple); border-radius: 8px; padding: 5px 9px; font-size: 12px; font-weight: 700; min-width: 50px; text-align: center; white-space: nowrap; }
+  .event-badge { background: rgba(6,182,212,0.15); color: var(--cyan); border-radius: 8px; padding: 5px 9px; font-size: 12px; font-weight: 700; min-width: 50px; text-align: center; }
+  .item-title { font-size: 14px; font-weight: 600; }
+  .item-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* TX ROW */
+  .tx-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); gap: 8px; }
+  .tx-row:last-child { border-bottom: none; }
+  .tx-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .tx-info { flex: 1; }
+  .tx-desc { font-size: 14px; font-weight: 600; }
+  .tx-meta { font-size: 11px; color: var(--muted); }
+  .tx-amount { font-size: 14px; font-weight: 700; white-space: nowrap; }
+
+  /* CAT BAR */
+  .cat-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .cat-name { font-size: 12px; width: 80px; flex-shrink: 0; }
+  .cat-bar-bg { flex: 1; background: #2D2D4A; border-radius: 4px; height: 8px; overflow: hidden; }
+  .cat-bar-fill { height: 100%; border-radius: 4px; background: var(--purple); }
+  .cat-amount { font-size: 11px; color: var(--muted); width: 60px; text-align: right; flex-shrink: 0; }
+
+  /* GOAL */
+  .goal-item { margin-bottom: 16px; }
+  .goal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .goal-name { font-size: 15px; font-weight: 600; }
+  .goal-pct { font-size: 13px; font-weight: 700; }
+  .goal-footer { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  /* TODO */
+  .todo-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .todo-item:last-child { border-bottom: none; }
+  .checkbox { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--purple); flex-shrink: 0; }
+  .todo-text { font-size: 14px; }
+
+  /* ONBOARDING */
+  .onboarding { text-align: center; padding: 32px 20px; }
+  .onboarding .big-emoji { font-size: 72px; display: block; margin-bottom: 16px; }
+  .onboarding h1 { font-size: 32px; font-weight: 800; margin-bottom: 8px; }
+  .onboarding .subtitle { color: var(--muted); font-size: 16px; margin-bottom: 32px; }
+
+  /* LOADING */
+  .loading { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh; gap: 16px; }
+  .spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--purple); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* EMPTY */
+  .empty { text-align: center; padding: 32px 16px; }
+  .empty .e-emoji { font-size: 48px; margin-bottom: 12px; display: block; }
+  .empty h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+  .empty p { color: var(--muted); font-size: 13px; line-height: 1.6; }
+
+  /* HINT BOX */
+  .hint-box { background: rgba(124,58,237,0.08); border: 1px solid rgba(124,58,237,0.2); border-radius: 12px; padding: 14px; }
+  .hint-box p { font-size: 13px; color: var(--muted); line-height: 1.8; }
+  .hint-box p span { color: var(--purple-light); }
+
+  /* WA CARD */
+  .wa-card { text-align: center; padding: 20px; }
+  .wa-number { font-size: 22px; font-weight: 800; color: var(--purple); margin: 8px 0; }
+  .wa-code { font-size: 13px; color: var(--muted); }
+
+  /* TIPS */
+  .tips-row { display: flex; gap: 10px; margin-top: 16px; }
+  .tip-card { flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 8px; text-align: center; }
+  .tip-card .t-emoji { font-size: 24px; display: block; margin-bottom: 8px; }
+  .tip-card p { font-size: 11px; color: var(--muted); }
+
+  /* BADGE */
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 700; }
+  .badge-green { background: rgba(16,185,129,0.15); color: var(--green); }
+  .badge-red { background: rgba(239,68,68,0.15); color: var(--red); }
+  .badge-yellow { background: rgba(245,158,11,0.15); color: var(--yellow); }
+
+  .green { color: var(--green); }
+  .red { color: var(--red); }
+  .purple { color: var(--purple); }
+  .muted { color: var(--muted); }
+</style>
+</head>
+<body>
+
+<!-- BOTTOM NAV -->
+<nav class="nav">
+  <button class="nav-btn active" onclick="showScreen('home')">
+    <span class="icon">🏠</span>Home
+  </button>
+  <button class="nav-btn" onclick="showScreen('finance')">
+    <span class="icon">💰</span>Finance
+  </button>
+  <button class="nav-btn" onclick="showScreen('schedule')">
+    <span class="icon">📅</span>Schedule
+  </button>
+  <button class="nav-btn" onclick="showScreen('goals')">
+    <span class="icon">🎯</span>Goals
+  </button>
+</nav>
+
+<!-- HOME -->
+<div class="screen active" id="screen-home">
+  <div class="loading" id="loading-home">
+    <div class="spinner"></div>
+    <p class="muted">Connecting to Ava...</p>
+  </div>
+  <div id="home-content" style="display:none"></div>
+</div>
+
+<!-- FINANCE -->
+<div class="screen" id="screen-finance">
+  <div class="loading" id="loading-finance">
+    <div class="spinner"></div>
+  </div>
+  <div id="finance-content" style="display:none"></div>
+</div>
+
+<!-- SCHEDULE -->
+<div class="screen" id="screen-schedule">
+  <div class="loading" id="loading-schedule">
+    <div class="spinner"></div>
+  </div>
+  <div id="schedule-content" style="display:none"></div>
+</div>
+
+<!-- GOALS -->
+<div class="screen" id="screen-goals">
+  <div class="loading" id="loading-goals">
+    <div class="spinner"></div>
+  </div>
+  <div id="goals-content" style="display:none"></div>
+</div>
+
+<script>
+let dashData = null;
+
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+function fmt(amount, currency) {
+  return `${currency} ${parseFloat(amount).toLocaleString('en', {maximumFractionDigits: 2})}`;
+}
+
+function fmtShort(amount, currency) {
+  return `${currency} ${parseFloat(amount).toLocaleString('en', {maximumFractionDigits: 0})}`;
+}
+
+async function loadData() {
+  try {
+    const res = await fetch('/api/v1/dashboard', {
+      headers: { 'ngrok-skip-browser-warning': 'true' }
+    });
+    const data = await res.json();
+    if (data.status === 'no_user') {
+      data.user = { currency: 'R$', total_messages: 0, is_personalized: false, messages_to_personalize: 20 };
+      data.finance = { month: '', income: 0, expenses: 0, net: 0, by_category: [], budgets: [] };
+      data.reminders = []; data.events = []; data.goals = []; data.todos = []; data.recent_transactions = [];
+    }
+    dashData = data;
+    renderHome(data);
+    renderFinance(data);
+    renderSchedule(data);
+    renderGoals(data);
+  } catch(e) {
+    document.getElementById('loading-home').innerHTML = `
+      <span style="font-size:48px">🔌</span>
+      <p style="font-size:18px;font-weight:700">Connection error</p>
+      <p class="muted" style="text-align:center">Make sure Ava bot is running<br>and try refreshing</p>
+      <button onclick="loadData()" style="margin-top:16px;background:var(--purple);color:white;border:none;padding:12px 24px;border-radius:12px;cursor:pointer;font-size:14px;font-weight:700">Retry</button>
+    `;
+  }
+}
+
+function renderHome(data) {
+  document.getElementById('loading-home').style.display = 'none';
+  const content = document.getElementById('home-content');
+  content.style.display = 'block';
+
+  const { user, finance, reminders, recent_transactions } = data;
+  const cur = user.currency || 'R$';
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+
+  if (!user.is_personalized) {
+    const pct = Math.min((user.total_messages / 20) * 100, 100);
+    content.innerHTML = `
+      <div class="onboarding">
+        <span class="big-emoji">✨</span>
+        <h1>Hey! I'm Ava.</h1>
+        <p class="subtitle">Your AI Life Companion</p>
+      </div>
+      <div class="card">
+        <p class="card-title">🧠 Learning about you...</p>
+        <div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div>
+        <p style="text-align:center;font-size:14px;font-weight:700;color:var(--purple);margin-top:8px">
+          ${user.total_messages} / 20 conversations
+        </p>
+        <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:6px">
+          After 20 chats, I'll personalize your dashboard ✨
+        </p>
+      </div>
+      <div class="card wa-card">
+        <p class="card-title">📱 Message me on WhatsApp</p>
+        <p class="wa-number">+1 415 523 8886</p>
+        <p class="wa-code">Send: join unusual-labor</p>
+      </div>
+      <p style="color:var(--muted);font-size:12px;margin-bottom:8px;margin-left:4px">Try saying to Ava:</p>
+      <div class="tips-row">
+        <div class="tip-card"><span class="t-emoji">💰</span><p>"50 lunch"</p></div>
+        <div class="tip-card"><span class="t-emoji">⏰</span><p>"remind me..."</p></div>
+        <div class="tip-card"><span class="t-emoji">💬</span><p>"how are you?"</p></div>
+      </div>
+    `;
+    return;
+  }
+
+  const netPos = finance.net >= 0;
+  const recentHtml = recent_transactions.slice(0, 5).map(tx => `
+    <div class="tx-row">
+      <div class="tx-dot" style="background:${tx.type === 'income' ? 'var(--green)' : 'var(--red)'}"></div>
+      <div class="tx-info">
+        <div class="tx-desc">${tx.description}</div>
+        <div class="tx-meta">${tx.category} · ${tx.date}</div>
+      </div>
+      <div class="tx-amount" style="color:${tx.type === 'income' ? 'var(--green)' : 'var(--red)'}">
+        ${tx.type === 'income' ? '+' : '-'}${fmtShort(tx.amount, cur)}
+      </div>
+    </div>
+  `).join('');
+
+  const remindersHtml = reminders.slice(0, 3).map(r => `
+    <div class="list-item">
+      <span class="time-badge">${r.time.slice(11,16)}</span>
+      <div><div class="item-title">${r.text}</div><div class="item-sub">${r.time.slice(0,10)}</div></div>
+    </div>
+  `).join('');
+
+  content.innerHTML = `
+    <div class="page-header">
+      <h1>${greeting} ☀️</h1>
+      <p>${finance.month}</p>
+    </div>
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="s-icon">💚</div>
+        <div class="s-label">Income</div>
+        <div class="s-value green">${fmtShort(finance.income, cur)}</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon">🔴</div>
+        <div class="s-label">Spent</div>
+        <div class="s-value red">${fmtShort(finance.expenses, cur)}</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-icon">${netPos ? '✅' : '❌'}</div>
+        <div class="s-label">Net</div>
+        <div class="s-value" style="color:${netPos ? 'var(--green)' : 'var(--red)'}">${fmtShort(Math.abs(finance.net), cur)}</div>
+      </div>
+    </div>
+    ${reminders.length > 0 ? `
+    <div class="card">
+      <p class="card-title">⏰ Upcoming</p>
+      ${remindersHtml}
+    </div>` : ''}
+    ${recent_transactions.length > 0 ? `
+    <div class="card">
+      <p class="card-title">📋 Recent Activity</p>
+      ${recentHtml}
+    </div>` : ''}
+  `;
+}
+
+function renderFinance(data) {
+  document.getElementById('loading-finance').style.display = 'none';
+  const content = document.getElementById('finance-content');
+  content.style.display = 'block';
+  const { finance, recent_transactions, user } = data;
+  const cur = user.currency || 'R$';
+  const netPos = finance.net >= 0;
+  const maxCat = Math.max(...finance.by_category.map(c => c.amount), 1);
+
+  const catsHtml = finance.by_category.map(cat => `
+    <div class="cat-row">
+      <span class="cat-name">${cat.category}</span>
+      <div class="cat-bar-bg"><div class="cat-bar-fill" style="width:${(cat.amount/maxCat)*100}%"></div></div>
+      <span class="cat-amount">${fmtShort(cat.amount, cur)}</span>
+    </div>
+  `).join('');
+
+  const budgetsHtml = finance.budgets.map(b => {
+    const pct = b.limit > 0 ? Math.min((b.spent/b.limit)*100, 100) : 0;
+    const color = pct >= 100 ? 'var(--red)' : pct >= 80 ? 'var(--yellow)' : 'var(--green)';
+    return `
+      <div style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+          <span style="font-size:13px;font-weight:600">${b.category}</span>
+          <span style="font-size:12px;font-weight:700;color:${color}">${pct.toFixed(0)}%</span>
+        </div>
+        <div class="bar-bg"><div class="bar-fill" style="width:${pct}%;background:${color}"></div></div>
+        <p style="font-size:11px;color:var(--muted);margin-top:4px">${fmt(b.spent,cur)} / ${fmt(b.limit,cur)}</p>
+      </div>
+    `;
+  }).join('');
+
+  const txHtml = recent_transactions.map(tx => `
+    <div class="tx-row">
+      <div class="tx-dot" style="background:${tx.type==='income'?'var(--green)':'var(--red)'}"></div>
+      <div class="tx-info">
+        <div class="tx-desc">${tx.description}</div>
+        <div class="tx-meta">${tx.category} · ${tx.date}</div>
+      </div>
+      <div class="tx-amount" style="color:${tx.type==='income'?'var(--green)':'var(--red)'}">
+        ${tx.type==='income'?'+':'-'}${fmtShort(tx.amount,cur)}
+      </div>
+    </div>
+  `).join('');
+
+  content.innerHTML = `
+    <div class="page-header"><h1>💰 Finance</h1><p>${finance.month}</p></div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-around;text-align:center">
+        <div><p style="font-size:11px;color:var(--muted)">Income</p><p style="font-size:16px;font-weight:700;color:var(--green);margin-top:4px">${fmt(finance.income,cur)}</p></div>
+        <div style="width:1px;background:var(--border)"></div>
+        <div><p style="font-size:11px;color:var(--muted)">Expenses</p><p style="font-size:16px;font-weight:700;color:var(--red);margin-top:4px">${fmt(finance.expenses,cur)}</p></div>
+        <div style="width:1px;background:var(--border)"></div>
+        <div><p style="font-size:11px;color:var(--muted)">Net</p><p style="font-size:16px;font-weight:700;color:${netPos?'var(--green)':'var(--red)'};margin-top:4px">${netPos?'+':''}${fmt(finance.net,cur)}</p></div>
+      </div>
+    </div>
+    ${finance.by_category.length>0?`<div class="card"><p class="card-title">By Category</p>${catsHtml}</div>`:''}
+    ${finance.budgets.length>0?`<div class="card"><p class="card-title">Budget Limits</p>${budgetsHtml}</div>`:''}
+    ${recent_transactions.length>0?`<div class="card"><p class="card-title">Transactions</p>${txHtml}</div>`:''}
+  `;
+}
+
+function renderSchedule(data) {
+  document.getElementById('loading-schedule').style.display = 'none';
+  const content = document.getElementById('schedule-content');
+  content.style.display = 'block';
+  const { reminders, events } = data;
+  const today = new Date().toLocaleDateString('en',{weekday:'long',month:'long',day:'numeric'});
+
+  const remHtml = reminders.map(r => `
+    <div class="list-item">
+      <span class="time-badge">${r.time.slice(11,16)}</span>
+      <div><div class="item-title">${r.text}</div><div class="item-sub">${r.time.slice(0,10)}</div></div>
+    </div>
+  `).join('');
+
+  const evHtml = events.map(e => `
+    <div class="list-item">
+      <span class="event-badge">${e.time.slice(11,16)}</span>
+      <div><div class="item-title">${e.title}</div><div class="item-sub">${e.time.slice(0,10)}</div></div>
+    </div>
+  `).join('');
+
+  content.innerHTML = `
+    <div class="page-header"><h1>📅 Schedule</h1><p>${today}</p></div>
+    ${reminders.length===0&&events.length===0?`
+      <div class="card empty">
+        <span class="e-emoji">🎉</span>
+        <h3>All clear!</h3>
+        <p>No reminders or events yet.<br>Tell Ava on WhatsApp to add some!</p>
+      </div>
+    `:''}
+    ${reminders.length>0?`<div class="card"><p class="card-title">⏰ Reminders</p>${remHtml}</div>`:''}
+    ${events.length>0?`<div class="card"><p class="card-title">📆 Events</p>${evHtml}</div>`:''}
+    <div class="card hint-box">
+      <p class="card-title">💬 Add via WhatsApp</p>
+      <p>
+        <span>"remind me to call mom at 5pm"</span><br>
+        <span>"add event dentist tomorrow at 2pm"</span><br>
+        <span>"what do I have today?"</span>
+      </p>
+    </div>
+  `;
+}
+
+function renderGoals(data) {
+  document.getElementById('loading-goals').style.display = 'none';
+  const content = document.getElementById('goals-content');
+  content.style.display = 'block';
+  const { goals, todos, user } = data;
+  const cur = user.currency || 'R$';
+
+  const goalsHtml = goals.map(g => {
+    const pct = g.target > 0 ? Math.min((g.saved/g.target)*100, 100) : 0;
+    const color = pct >= 100 ? 'var(--green)' : pct >= 60 ? 'var(--yellow)' : 'var(--purple)';
+    return `
+      <div class="goal-item">
+        <div class="goal-header">
+          <span class="goal-name">${g.name}</span>
+          <span class="goal-pct" style="color:${color}">${pct.toFixed(0)}%</span>
+        </div>
+        <div class="bar-bg"><div class="bar-fill" style="width:${pct}%;background:${color}"></div></div>
+        <div class="goal-footer">
+          <span>${fmt(g.saved,cur)} saved</span>
+          <span>Goal: ${fmt(g.target,cur)}</span>
+        </div>
+        ${g.deadline?`<p style="font-size:11px;color:var(--muted);margin-top:4px">🗓 ${g.deadline}</p>`:''}
+      </div>
+    `;
+  }).join('');
+
+  const todosHtml = todos.map(t => `
+    <div class="todo-item">
+      <div class="checkbox"></div>
+      <span class="todo-text">${t.text}</span>
+    </div>
+  `).join('');
+
+  content.innerHTML = `
+    <div class="page-header"><h1>🎯 Goals & Todos</h1><p>Track your progress</p></div>
+    <div class="card">
+      <p class="card-title">💰 Savings Goals</p>
+      ${goals.length>0 ? goalsHtml : '<div class="empty"><span class="e-emoji">🎯</span><h3>No goals yet</h3><p>Tell Ava: "savings goal trip R$5000"</p></div>'}
+    </div>
+    <div class="card">
+      <p class="card-title">✅ To-Do List</p>
+      ${todos.length>0 ? todosHtml : '<div class="empty"><span class="e-emoji">🎉</span><h3>All done!</h3><p>Tell Ava: "add todo buy groceries"</p></div>'}
+    </div>
+  `;
+}
+
+loadData();
+</script>
+</body>
+</html>

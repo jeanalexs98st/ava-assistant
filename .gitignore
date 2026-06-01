@@ -1,0 +1,8 @@
+.env
+finance.db
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+audio_replies/
+*.mp3
