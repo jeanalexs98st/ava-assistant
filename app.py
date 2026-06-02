@@ -429,7 +429,11 @@ def handle_message(phone, body):
         db.add_transaction(phone, amount, "Income", description, "income")
         return t(lang, "income_logged", amount=fmt(amount), desc=description, category="Income")
 
-    return t(lang, "fallback")
+    # Unknown intent — let Ava respond naturally instead of showing fallback
+    try:
+        return advisor.ask_advisor(phone, text, CURRENCY, lang, is_chat=True)
+    except Exception:
+        return t(lang, "fallback")
 
 
 @app.route("/audio/<filename>")
