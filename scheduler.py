@@ -2,7 +2,15 @@ import os
 import time
 import threading
 from datetime import datetime
+import pytz
 import database as db
+
+def get_now():
+    tz_name = os.getenv("TIMEZONE", "America/Sao_Paulo")
+    try:
+        return datetime.now(pytz.timezone(tz_name))
+    except Exception:
+        return datetime.now()
 
 TWILIO_FROM = "whatsapp:+14155238886"
 _twilio_client = None
