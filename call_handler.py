@@ -65,8 +65,9 @@ def twiml_respond():
     try:
         phone = f"call:{caller}"
         reply = advisor.ask_advisor(phone, speech_result, "£", lang, is_chat=True)
-        # Clean up ||| separators for spoken response
-        spoken = reply.replace("|||", " ... ").replace("*", "").replace("_", "")
+        # Clean up for speech — remove emojis, markdown, separators
+        from voice import clean_for_speech
+        spoken = clean_for_speech(reply.replace("|||", " ... "))
     except Exception as e:
         spoken = "Sorry, something went wrong on my end. Try again?"
 

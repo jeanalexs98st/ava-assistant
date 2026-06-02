@@ -87,8 +87,8 @@ def synthesize_speech(text: str, lang: str = "en") -> str:
     Uses the 'onyx' voice — deep, natural, human-sounding male.
     Returns the audio filename.
     """
-    # Clean up ||| separators and make it sound natural when spoken
-    clean_text = text.replace("|||", " ... ")
+    # Clean up for speech — remove emojis, markdown, separators
+    clean_text = clean_for_speech(text.replace("|||", " ... "))
 
     filename = f"{uuid.uuid4()}.mp3"
     filepath = os.path.join(AUDIO_DIR, filename)
