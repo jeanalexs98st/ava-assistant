@@ -21,7 +21,7 @@ def get_client():
 LANG_CODES = {"en": "en", "pt": "pt", "es": "es"}
 
 WHISPER_PROMPT = (
-    "This is a voice message to a personal finance assistant called Mort. "
+    "This is a voice message to a personal AI assistant called Ava. "
     "The user may mention money amounts, expenses, income, food, transport, bills, "
     "shopping, budgets, savings. They may speak casually, use slang, filler words "
     "like 'um', 'uh', 'like', 'então', 'tipo', 'pois', 'este', 'bueno', 'o sea'. "
@@ -61,7 +61,7 @@ def synthesize_speech(text: str, lang: str = "en") -> str:
 
     response = get_client().audio.speech.create(
         model="tts-1-hd",   # HD = highest quality, same as ChatGPT
-        voice="onyx",        # Deep, natural male voice — Mort's voice
+        voice="fable",       # British accent, natural female — Ava's voice
         input=clean_text,
         speed=0.95,          # Slightly slower = more natural conversation feel
     )

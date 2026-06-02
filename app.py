@@ -485,6 +485,19 @@ def dashboard():
     return render_template("dashboard.html")
 
 
+# ─── Voice Call Routes ───────────────────────────────────────
+@app.route("/call/voice", methods=["GET", "POST"])
+def call_voice():
+    import call_handler
+    return call_handler.twiml_greet(), 200, {"Content-Type": "application/xml"}
+
+
+@app.route("/call/respond", methods=["POST"])
+def call_respond():
+    import call_handler
+    return call_handler.twiml_respond(), 200, {"Content-Type": "application/xml"}
+
+
 @app.route("/health")
 def health():
     return {"status": "ok"}, 200
