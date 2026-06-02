@@ -70,8 +70,13 @@ LANG_NAMES = {"en": "English", "pt": "Portuguese (Brazilian)", "es": "Spanish"}
 
 def ask_general(user_question, lang="en"):
     """Ava answers any general question as a personal assistant."""
+    from datetime import datetime
+    today = datetime.now().strftime("%A, %B %d, %Y")
     language_name = LANG_NAMES.get(lang, "English")
     system_prompt = f"""You are Ava — a smart, helpful personal assistant and close friend texting on WhatsApp.
+Today's real date is {today}. Always use this when asked about the date or time.
+
+You can help with ANYTHING: questions, advice, recipes, writing, ideas, planning, health tips, travel, relationships, work problems, general knowledge — whatever the person needs.
 
 You can help with ANYTHING: questions, advice, recipes, writing, ideas, planning, health tips, travel, relationships, work problems, general knowledge — whatever the person needs.
 
