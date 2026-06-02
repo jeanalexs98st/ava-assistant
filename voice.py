@@ -47,6 +47,40 @@ def transcribe_audio(media_url: str, account_sid: str, auth_token: str, lang: st
     return transcript.text.strip()
 
 
+def clean_for_speech(text: str) -> str:
+    """Remove emojis, markdown and symbols that sound weird when spoken."""
+    import re
+    # Remove emojis
+    emoji_pattern = re.compile("["
+        u"\U0001F600-\U0001F64F"
+        u"\U0001F300-\U0001F5FF"
+        u"\U0001F680-\U0001F6FF"
+        u"\U0001F1E0-\U0001F1FF"
+        u"\U00002500-\U00002BEF"
+        u"\U00002702-\U000027B0"
+        u"\U000024C2-\U0001F251"
+        u"\U0001f926-\U0001f937"
+        u"\U00010000-\U0010ffff"
+        u"♀-♂"
+        u"☀-⭕"
+        u"‍"
+        u"⏏"
+        u"⏩"
+        u"⌚"
+        u"️"
+        u"〰"
+        "]+", re.UNICODE)
+    text = emoji_pattern.sub('', text)
+    # Remove markdown
+    text = re.sub(r'\*+', '', text)
+    text = re.sub(r'_+', '', text)
+    text = re.sub(r'`+', '', text)
+    text = re.sub(r'\|+', ' ', text)
+    # Clean extra spaces
+    text = re.sub(r'\s+', ' ', text).strip()
+    return text
+
+
 def synthesize_speech(text: str, lang: str = "en") -> str:
     """
     Convert text to audio using OpenAI TTS (same engine as ChatGPT voice).

@@ -471,8 +471,21 @@ def webhook():
     db.set_last_context(phone, incoming, reply)
     print(f"📤 REPLY: {reply[:200]}")
     parts = [p.strip() for p in reply.split("|||") if p.strip()]
-    # Cap at 1 message for sandbox reliability
     combined = " ".join(parts)
+
+    # If user sent a voice note, reply with Ava's voice
+    if is_voice:
+        try:
+            base_url = os.getenv("RAILWAY_STATIC_URL", "https://web-production-6f59e.up.railway.app")
+            lang_hint = db.get_language(phone)
+            audio_file = voice.synthesize_speech(combined, lang=lang_hint)
+            audio_url = f"{base_url}/audio/{audio_file}"
+            resp.message("").media(audio_url)
+            print(f"🎙️ VOICE REPLY sent: {audio_url}")
+            return str(resp), 200, {"Content-Type": "application/xml"}
+        except Exception as e:
+            print(f"❌ Voice reply failed: {e}")
+
     resp.message(combined)
     print(f"📤 SENDING: 1 combined message")
 
