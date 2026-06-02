@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <radialGradient id="bgGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#1a0a3a"/>
+      <stop offset="100%" stop-color="#0D0D1A"/>
+    </radialGradient>
+    <radialGradient id="coreGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#A78BFA"/>
+      <stop offset="50%" stop-color="#7C3AED"/>
+      <stop offset="100%" stop-color="#4C1D95" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="strongGlow">
+      <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+      <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A78BFA"/>
+      <stop offset="50%" stop-color="#06B6D4"/>
+      <stop offset="100%" stop-color="#7C3AED"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="400" fill="url(#bgGlow)" rx="40"/>
+
+  <!-- Outer ring -->
+  <circle cx="200" cy="200" r="170" fill="none" stroke="#7C3AED" stroke-width="1" stroke-dasharray="8,6" opacity="0.4" filter="url(#glow)"/>
+  <circle cx="200" cy="200" r="155" fill="none" stroke="#06B6D4" stroke-width="0.5" opacity="0.3"/>
+
+  <!-- Rotating circuit lines -->
+  <g opacity="0.5" filter="url(#glow)">
+    <!-- Top -->
+    <line x1="200" y1="30" x2="200" y2="70" stroke="#7C3AED" stroke-width="1.5"/>
+    <line x1="185" y1="70" x2="215" y2="70" stroke="#7C3AED" stroke-width="1"/>
+    <!-- Bottom -->
+    <line x1="200" y1="330" x2="200" y2="370" stroke="#7C3AED" stroke-width="1.5"/>
+    <line x1="185" y1="330" x2="215" y2="330" stroke="#7C3AED" stroke-width="1"/>
+    <!-- Left -->
+    <line x1="30" y1="200" x2="70" y2="200" stroke="#06B6D4" stroke-width="1.5"/>
+    <line x1="70" y1="185" x2="70" y2="215" stroke="#06B6D4" stroke-width="1"/>
+    <!-- Right -->
+    <line x1="330" y1="200" x2="370" y2="200" stroke="#06B6D4" stroke-width="1.5"/>
+    <line x1="330" y1="185" x2="330" y2="215" stroke="#06B6D4" stroke-width="1"/>
+    <!-- Diagonals -->
+    <line x1="80" y1="80" x2="110" y2="110" stroke="#A78BFA" stroke-width="1"/>
+    <line x1="290" y1="80" x2="320" y2="110" stroke="#A78BFA" stroke-width="1" transform="scale(-1,1) translate(-400,0)"/>
+    <line x1="80" y1="320" x2="110" y2="290" stroke="#A78BFA" stroke-width="1"/>
+    <line x1="320" y1="320" x2="290" y2="290" stroke="#A78BFA" stroke-width="1"/>
+  </g>
+
+  <!-- Node dots on circuit lines -->
+  <g fill="#06B6D4" filter="url(#glow)" opacity="0.8">
+    <circle cx="200" cy="45" r="4"/>
+    <circle cx="200" cy="355" r="4"/>
+    <circle cx="45" cy="200" r="4"/>
+    <circle cx="355" cy="200" r="4"/>
+    <circle cx="97" cy="97" r="3"/>
+    <circle cx="303" cy="97" r="3"/>
+    <circle cx="97" cy="303" r="3"/>
+    <circle cx="303" cy="303" r="3"/>
+  </g>
+
+  <!-- Inner hexagon ring -->
+  <polygon points="200,105 265,142 265,217 200,254 135,217 135,142"
+    fill="none" stroke="#7C3AED" stroke-width="1.5" opacity="0.6" filter="url(#glow)"/>
+  <polygon points="200,120 252,150 252,210 200,240 148,210 148,150"
+    fill="none" stroke="#06B6D4" stroke-width="0.8" opacity="0.4"/>
+
+  <!-- Core glow circle -->
+  <circle cx="200" cy="200" r="75" fill="url(#coreGlow)" opacity="0.3"/>
+  <circle cx="200" cy="200" r="60" fill="#0D0D1A" stroke="#7C3AED" stroke-width="1.5" filter="url(#glow)"/>
+  <circle cx="200" cy="200" r="58" fill="none" stroke="#06B6D4" stroke-width="0.5" opacity="0.5"/>
+
+  <!-- Small orbital nodes -->
+  <g filter="url(#glow)">
+    <circle cx="200" cy="128" r="5" fill="#A78BFA"/>
+    <circle cx="261" cy="164" r="5" fill="#06B6D4"/>
+    <circle cx="261" cy="236" r="5" fill="#06B6D4"/>
+    <circle cx="200" cy="272" r="5" fill="#A78BFA"/>
+    <circle cx="139" cy="236" r="5" fill="#06B6D4"/>
+    <circle cx="139" cy="164" r="5" fill="#06B6D4"/>
+  </g>
+
+  <!-- AVA text -->
+  <text x="200" y="215"
+    font-family="'Courier New', monospace"
+    font-size="52"
+    font-weight="900"
+    text-anchor="middle"
+    fill="url(#textGrad)"
+    filter="url(#strongGlow)"
+    letter-spacing="8">AVA</text>
+
+  <!-- Subtitle -->
+  <text x="200" y="240"
+    font-family="'Courier New', monospace"
+    font-size="9"
+    text-anchor="middle"
+    fill="#06B6D4"
+    letter-spacing="5"
+    opacity="0.8">AI LIFE COMPANION</text>
+
+  <!-- Bottom scan line effect -->
+  <rect x="148" y="246" width="104" height="1" fill="#7C3AED" opacity="0.6" filter="url(#glow)"/>
+
+  <!-- Corner brackets -->
+  <g stroke="#06B6D4" stroke-width="1.5" fill="none" opacity="0.6">
+    <path d="M 55 55 L 55 75 L 75 75"/>
+    <path d="M 345 55 L 345 75 L 325 75"/>
+    <path d="M 55 345 L 55 325 L 75 325"/>
+    <path d="M 345 345 L 345 325 L 325 325"/>
+  </g>
+</svg>

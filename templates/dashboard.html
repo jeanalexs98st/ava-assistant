@@ -7,6 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0D0D1A">
 <title>Ava — Your AI Life Companion</title>
+<link rel="icon" type="image/svg+xml" href="/static/ava-logo.svg">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   :root {
@@ -238,7 +239,7 @@ function renderHome(data) {
     const pct = Math.min((user.total_messages / 20) * 100, 100);
     content.innerHTML = `
       <div class="onboarding">
-        <span class="big-emoji">✨</span>
+        <img src="/static/ava-logo.svg" style="width:140px;height:140px;margin-bottom:8px"/>
         <h1>Hey! I'm Ava.</h1>
         <p class="subtitle">Your AI Life Companion</p>
       </div>
